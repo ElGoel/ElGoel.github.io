@@ -1,0 +1,98 @@
+---
+const sections = ['home', 'about', 'projects'];
+---
+
+<nav
+  class='fixed top-0 left-0 w-full px-3 dark:bg-background-dark/70 bg-background-light backdrop-blur-md z-50 shadow-lg flex items-center justify-between py-2'
+>
+  <a href='/'>
+    <img src='./logo.png' width='180px' alt='' />
+  </a>
+  <div class='flex justify-start gap-3 pl-5 w-full items-center'>
+    {
+      sections.map((section) => (
+        <a
+          class={`uppercase tracking-wide px-3 py-2 rounded-md transition-colors duration-300 cursor-pointer
+        text-gray-400 dark:text-gray-600 dark:hover:bg-primary-700 hover:bg-primary-500 hover:text-font-dark`}
+          href={`/#${section}`}
+          data-section={section}
+        >
+          {section}
+        </a>
+      ))
+    }
+  </div>
+  <div class='flex justify-center gap-5 items-center'>
+    <a
+      href='/contact'
+      class={`uppercase tracking-wide px-3 py-1 rounded-md transition-colors duration-300
+      text-gray-400 dark:text-font-dark hover:bg-primary-500 dark:hover:bg-primary-700 border-2 hover:text-font-dark border-primary-800`}
+      >Contact</a
+    >
+    <button
+      id='theme-toggle'
+      class='relative w-14 h-7 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center transition-colors duration-300 focus:outline-none'
+      aria-label='Toggle dark mode'
+    >
+      <span
+        id='theme-toggle-icon'
+        class='absolute -top-0.5 left-0 right-0 w-8 h-8 rounded-full bg-cyan-400 dark:bg-cyan-600 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out transform dark:translate-x-6'
+      >
+        <svg
+          id='sun-icon'
+          xmlns='http://www.w3.org/2000/svg'
+          class='h-5 w-5 text-gray-900 dark:hidden'
+          viewBox='0 0 20 20'
+          fill='currentColor'
+        >
+          <path
+            d='M10 3.22l.61 1.86a.75.75 0 001.42 0L13 3.22a.75.75 0 00-.67-1.02H7.67a.75.75 0 00-.67 1.02zM4.22 4.22a.75.75 0 011.06 0L6.5 5.44a.75.75 0 11-1.06 1.06L4.22 5.28a.75.75 0 010-1.06zm11.06 0a.75.75 0 010 1.06L14.56 6.5a.75.75 0 11-1.06-1.06l1.22-1.22a.75.75 0 011.06 0zM10 6.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.78 5.28a.75.75 0 010 1.06l-1.22 1.22a.75.75 0 11-1.06-1.06l1.22-1.22a.75.75 0 011.06 0zM3.22 10.78a.75.75 0 010-1.06L4.44 8.5a.75.75 0 111.06 1.06L4.22 10.78a.75.75 0 01-1.06 0z'
+          ></path>
+        </svg>
+
+        <svg
+          id='moon-icon'
+          xmlns='http://www.w3.org/2000/svg'
+          class='h-5 w-5 text-white hidden dark:block'
+          viewBox='0 0 20 20'
+          fill='currentColor'
+        >
+          <path d='M17.293 13.293A8 8 0 016.707 2.707 8 8 0 1017.293 13.293z'
+          ></path>
+        </svg>
+      </span>
+    </button>
+  </div>
+</nav>
+
+<script type='module' is:inline>
+  import { initLavaBackground } from '/scripts/lava-background.js';
+
+  let cleanupBackground;
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function applyTheme(isDark) {
+    document.documentElement.classList.toggle('dark', isDark);
+
+    if (cleanupBackground) cleanupBackground();
+    cleanupBackground = initLavaBackground({ darkMode: isDark });
+  }
+
+  const initialDark =
+    localStorage.theme === 'dark' ||
+    (!('theme' in localStorage) && prefersDark.matches);
+  applyTheme(initialDark);
+
+  prefersDark.addEventListener('change', (e) => {
+    if (!('theme' in localStorage)) {
+      applyTheme(e.matches);
+    }
+  });
+
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const isDark = !document.documentElement.classList.contains('dark');
+    localStorage.theme = isDark ? 'dark' : 'light';
+    applyTheme(isDark);
+  });
+</script>

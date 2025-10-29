@@ -1,0 +1,140 @@
+---
+import Navbar from '../components/Navbar.astro';
+---
+
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Angelo — Portfolio</title>
+  </head>
+  <body class='bg-gray-950 text-gray-100 overflow-hidden'>
+    <Navbar />
+
+    <main
+      id='main-viewport'
+      class='relative z-10 w-screen h-screen overflow-hidden'
+    >
+      <div
+        id='main-scroll'
+        class='flex h-screen w-[400vw] overflow-x-scroll snap-x snap-mandatory scroll-smooth no-scrollbar'
+      >
+        <slot />
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        const isRoot =
+          location.pathname === '/' ||
+          location.pathname === '' ||
+          location.pathname === '/index.html';
+
+        if (isRoot) {
+          document.addEventListener('click', (e) => {
+            const el = e.target.closest('a[data-section]');
+            if (!el) return;
+            e.preventDefault();
+            const sectionId = el.dataset.section;
+            const target = document.getElementById(sectionId);
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'start',
+                block: 'nearest'
+              });
+              history.replaceState(null, '', `/`);
+            }
+          });
+        }
+
+        function scrollToHashIfPresent() {
+          const hash = (location.hash || '').replace('#', '');
+          if (!hash) return;
+          const el = document.getElementById(hash);
+          if (el) {
+            setTimeout(() => {
+              el.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'start',
+                block: 'nearest'
+              });
+              history.replaceState(null, '', `/`);
+            }, 120);
+          }
+        }
+
+        function observeSections() {
+          const viewportRoot = document.getElementById('main-viewport');
+          if (!viewportRoot) return;
+
+          const activeClasses = [
+            'bg-primary-500',
+            'text-font-dark',
+            'dark:text-font-dark',
+            'dark:bg-primary-800',
+            'font-bold'
+          ];
+          const inactiveClasses = ['text-gray-300', 'dark:text-gray-700'];
+
+          const sections = document.querySelectorAll(
+            '#home, #about, #projects'
+          );
+
+          if (sections.length === 0) return;
+
+          const observerOptions = {
+            root: viewportRoot,
+            rootMargin: '0px',
+            threshold: 0.5
+          };
+
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              const id = entry.target.id;
+              const link = document.querySelector(`a[data-section="${id}"]`);
+              if (link) {
+                if (entry.isIntersecting) {
+                  link.classList.add(...activeClasses);
+                  link.classList.remove(...inactiveClasses);
+                } else {
+                  link.classList.remove(...activeClasses);
+                  link.classList.add(...inactiveClasses);
+                }
+              }
+            });
+          }, observerOptions);
+
+          sections.forEach((section) => {
+            observer.observe(section);
+          });
+        }
+
+        if (
+          document.readyState === 'complete' ||
+          document.readyState === 'interactive'
+        ) {
+          scrollToHashIfPresent();
+          observeSections();
+        } else {
+          document.addEventListener('DOMContentLoaded', () => {
+            scrollToHashIfPresent();
+            observeSections();
+          });
+        }
+
+        window.addEventListener('hashchange', scrollToHashIfPresent);
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
