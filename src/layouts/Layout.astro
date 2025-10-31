@@ -1,5 +1,6 @@
 ---
 import Navbar from '../components/Navbar.astro';
+import SocialIcons from '../components/SocialIcons.astro';
 import '../styles/global.css';
 ---
 
@@ -7,23 +8,33 @@ import '../styles/global.css';
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <link rel='icon' type='image/png' href='/favicon.svg' />
+    <link
+      href='https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css'
+      rel='stylesheet'
+    />
     <title>Angelo — Portfolio</title>
   </head>
-  <body class='bg-gray-950 text-gray-100 overflow-hidden'>
+  <body class='bg-gray-950 text-gray-100'>
     <Navbar />
 
     <main
       id='main-viewport'
-      class='relative z-10 w-screen h-screen overflow-hidden'
+      class='relative z-10 w-screen h-screen overflow-x-hidden overflow-y-hidden'
     >
       <div
         id='main-scroll'
-        class='flex h-screen w-[400vw] overflow-x-scroll snap-x snap-mandatory scroll-smooth no-scrollbar'
+        class='flex h-screen overflow-x-scroll snap-x snap-mandatory scroll-smooth no-scrollbar'
       >
         <slot />
       </div>
+      <SocialIcons />
+      <h1
+        class='fixed bottom-16 left-2/4 text-3xl text-grey-400'
+        id='pagination'
+      >
+      </h1>
     </main>
-
     <script>
       (function () {
         const isRoot =
@@ -72,11 +83,11 @@ import '../styles/global.css';
           const activeClasses = [
             'bg-primary-500',
             'text-font-dark',
-            'dark:text-font-dark',
-            'dark:bg-primary-800',
+            'dark:text-white',
+            'dark:bg-primary-500',
             'font-bold'
           ];
-          const inactiveClasses = ['text-gray-300', 'dark:text-gray-700'];
+          const inactiveClasses = ['text-gray-300', 'dark:text-gray-500'];
 
           const sections = document.querySelectorAll(
             '#home, #about, #projects'
@@ -93,11 +104,16 @@ import '../styles/global.css';
           const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
               const id = entry.target.id;
+              const index = Array.from(sections).indexOf(entry.target) + 1;
               const link = document.querySelector(`a[data-section="${id}"]`);
+              const pagination = document.getElementById(`pagination`);
               if (link) {
                 if (entry.isIntersecting) {
                   link.classList.add(...activeClasses);
                   link.classList.remove(...inactiveClasses);
+                  if (pagination) {
+                    pagination.textContent = `0${index}`;
+                  }
                 } else {
                   link.classList.remove(...activeClasses);
                   link.classList.add(...inactiveClasses);
@@ -125,6 +141,66 @@ import '../styles/global.css';
         }
 
         window.addEventListener('hashchange', scrollToHashIfPresent);
+      })();
+    </script>
+    <script>
+      (function () {
+        const container = document.getElementById('main-scroll');
+        const sections = Array.from(
+          document.querySelectorAll('#home, #about, #projects')
+        );
+        if (!container || sections.length === 0) return;
+
+        let currentIndex = 0;
+        let isScrolling = false;
+        const SCROLL_LOCK_TIME = 700;
+
+        function scrollToSection(index) {
+          if (index < 0 || index >= sections.length) return;
+
+          isScrolling = true;
+          currentIndex = index;
+
+          sections[index].scrollIntoView({
+            behavior: 'smooth',
+            inline: 'start',
+            block: 'nearest'
+          });
+
+          setTimeout(() => (isScrolling = false), SCROLL_LOCK_TIME);
+        }
+
+        window.addEventListener(
+          'wheel',
+          (e) => {
+            if (isScrolling) return;
+            e.preventDefault();
+
+            if (e.deltaY > 0) {
+              scrollToSection(currentIndex + 1);
+            } else if (e.deltaY < 0) {
+              scrollToSection(currentIndex - 1);
+            }
+          },
+          { passive: false }
+        );
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                currentIndex = sections.indexOf(entry.target);
+              }
+            });
+          },
+          { threshold: 0.6 }
+        );
+        sections.forEach((s) => observer.observe(s));
+
+        const btn = document.getElementById('next-section-btn');
+        btn.addEventListener('click', () => {
+          scrollToSection(currentIndex + 1);
+        });
       })();
     </script>
   </body>

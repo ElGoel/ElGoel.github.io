@@ -1,6 +1,30 @@
+---
+import TypewriterHero from '../../react/components/TypewriterHero';
+---
+
 <section
   id='home'
-  class='w-screen h-screen flex items-center justify-center snap-center'
+  class='w-screen h-screen flex relative flex-col items-center shrink-0 justify-center snap-center'
 >
-  <h1 class='text-5xl font-bold'>Welcome to My Portfolio</h1> 
+  <div class='container-section'>
+    <div class='flex flex-col'>
+      <div class='flex items-center justify-between'>
+        <h1 class='inline-block text-2xl text-gray-400'>HI THERE I'M</h1>
+        <hr class='ml-4 border-primary-500 w-[75%] border-4' />
+      </div>
+      <h1 class='text-[8rem] my-6 leading-none font-extrabold'>
+        Ángelo <br /> Colmenares
+      </h1>
+      <TypewriterHero client:load />
+    </div>
+    <button
+      id='next-section-btn'
+      class='relative bottom-1/2 left-[150%] flex items-center text-8xl text-gray-400 hover:text-gray-100 transition-transform duration-300 hover:scale-110 group'
+      aria-label='Scroll right'
+    >
+      <i class='absolute left-1 ri-arrow-right-s-line animate-bounce-right delay-0'></i>
+      <i class='absolute left-6 ri-arrow-right-s-line animate-bounce-right delay-200'></i>
+      <i class='absolute left-11 ri-arrow-right-s-line animate-bounce-right delay-400'></i>
+    </button>
+  </div>
 </section>
