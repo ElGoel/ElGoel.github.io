@@ -38,11 +38,11 @@ export function initLavaBackground({ darkMode = false } = {}) {
 
   // Crear "burbujas"
   const bubbles = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 15; i++) {
     const geom = new THREE.SphereGeometry(Math.random() * 0.7 + 0.4, 52, 52);
     const mat = new THREE.MeshStandardMaterial({
       color: darkMode ? 0x26C6DA : 0x00bcd4,
-      transparent: true,
+      transparent: false,
       opacity: darkMode ? 0.85 + Math.random() * 0.15 : 0.25 + Math.random() * 0.1,
       roughness: 0.4,
       metalness: 0.1,
